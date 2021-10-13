@@ -31,39 +31,39 @@ public class ServiceImple {
     }
 
     //Get all users
-    public List<User> retrieveAllUser(){
-        return  userRepository.findAll();
+    public List<User> retrieveAllUser() {
+        return userRepository.findAll();
     }
 
     //get user by id
-    public User retrieveUserById(long id){
+    public User retrieveUserById(long id) {
         Optional<User> optionalUser = userRepository.findById(id);
-        if (!optionalUser.isPresent()){
-            throw new  UserNotFoundException("id: "+id);
+        if (!optionalUser.isPresent()) {
+            throw new UserNotFoundException("id: " + id);
         }
 
-        User  userToBeFetched = optionalUser.get();
-        return  userToBeFetched;
+        User userToBeFetched = optionalUser.get();
+        return userToBeFetched;
     }
 
     //delete user by id
-    public  void deleteUser(long id){
+    public void deleteUser(long id) {
         userRepository.deleteById(id);
     }
 
     // create user
-    public ResponseEntity<User> createUser(User newUser){
+    public ResponseEntity<User> createUser(User newUser) {
         User savedUser = userRepository.save(newUser);
 
-       URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("id").buildAndExpand(savedUser.getId()).toUri();
-       return  ResponseEntity.created(location).build();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("id").buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     //Update User by id
-    public User updateUserById(long id, User user){
+    public User updateUserById(long id, User user) {
         Optional<User> userOptional = userRepository.findById(id);
-        if (!userOptional.isPresent()){
-            throw new UserNotFoundException("id: "+id);
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("id: " + id);
         }
 
         User userTobeUpdated = userOptional.get();
@@ -73,53 +73,53 @@ public class ServiceImple {
 
 
     //retrieve all user todos
-    public List<Todo> retrieveUserTodos(long id){
+    public List<Todo> retrieveUserTodos(long id) {
         Optional<User> userOptional = userRepository.findById(id);
-        if (!userOptional.isPresent()){
-            throw new UserNotFoundException("id: "+id);
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("id: " + id);
         }
 
-        return  userOptional.get().getTodos();
+        return userOptional.get().getTodos();
     }
 
     //create new todo for a user
-    public ResponseEntity<Todo> createNewUserTodo(long id, Todo todo){
+    public ResponseEntity<Todo> createNewUserTodo(long id, Todo todo) {
         Optional<User> userOptional = userRepository.findById(id);
-        if (!userOptional.isPresent()){
-            throw new UserNotFoundException("id "+id);
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("id " + id);
         }
         User user = userOptional.get();
         todo.setUser(user);
 
         todo.setStatus(Status.NEW);
-       todoRepository.save(todo);
+        todoRepository.save(todo);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("id").buildAndExpand(todo.getId()).toUri();
 
-       return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).build();
 
     }
 
 
     //update userTodo by id
-    public  Todo updateUserTodo(long userId,long todoId, Todo todo){
-  Optional<User> userOptional = userRepository.findById(userId);
-  Optional<Todo> todoOptional = todoRepository.findById(todoId);
-       if (!userOptional.isPresent()){
-           throw new UserNotFoundException("id: "+userId);
-       }
-       if (!todoOptional.isPresent()){
-           throw new TodoNotFoundException("id: " +todoId );
-       }
+    public Todo updateUserTodo(long userId, long todoId, Todo todo) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<Todo> todoOptional = todoRepository.findById(todoId);
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("id: " + userId);
+        }
+        if (!todoOptional.isPresent()) {
+            throw new TodoNotFoundException("id: " + todoId);
+        }
 
-       User user = userOptional.get();
-       Todo todoTobeUpdated  = todoOptional.get();
+        User user = userOptional.get();
+        Todo todoTobeUpdated = todoOptional.get();
 
-         //create a condition that wont let the user not to update the todo status to NEW
+        //create a condition that wont let the user not to update the todo status to NEW
         //the status need to be in progress or done.
 
 
-       todoTobeUpdated.setModifiedAt(new Date());
-       return  todoRepository.save(todoTobeUpdated);
+        todoTobeUpdated.setModifiedAt(new Date());
+        return todoRepository.save(todoTobeUpdated);
     }
 
     //delete user to do my id
