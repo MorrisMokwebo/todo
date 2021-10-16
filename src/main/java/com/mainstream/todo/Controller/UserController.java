@@ -25,6 +25,7 @@ public class UserController {
      *
      * @return
      */
+    @GetMapping
     public List<User> getAllUsers() {
         return serviceImple.retrieveAllUser();
     }
@@ -68,7 +69,7 @@ public class UserController {
      * @param user
      * @return
      */
-    @PutMapping("/{id}")
+    @PutMapping("/updateuser/{id}")
     public User updateUser(@PathVariable("id") long id, @RequestBody User user) {
         return serviceImple.updateUserById(id, user);
     }
@@ -108,5 +109,15 @@ public class UserController {
     @PutMapping("/{userid}/{todoid}/todo")
     public Todo updateUserTodo(@PathVariable("userid") long userId, @PathVariable("todoid") long todoId, @RequestBody Todo todo) {
         return serviceImple.updateUserTodo(userId, todoId, todo);
+    }
+
+    /**
+     * Delete existing user todo
+     * @param userId
+     * @param todoId
+     */
+    @DeleteMapping("/{userid}/{todoid}/todo")
+    public void deleteUserTodo(@PathVariable("userid") long userId, @PathVariable("todoid") long todoId) {
+        serviceImple.deleteUserTodo(userId, todoId);
     }
 }

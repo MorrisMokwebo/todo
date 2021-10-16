@@ -48,7 +48,13 @@ public class ServiceImple {
 
     //delete user by id
     public void deleteUser(long id) {
-        userRepository.deleteById(id);
+      Optional<User> userOptional = this.userRepository.findById(id);
+      if(!userOptional.isPresent()){
+          throw new UserNotFoundException("id :"+id);
+      }
+
+      User userToBeDeleted = userOptional.get();
+      userRepository.delete(userToBeDeleted);
     }
 
     // create user
@@ -61,14 +67,19 @@ public class ServiceImple {
 
     //Update User by id
     public User updateUserById(long id, User user) {
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<User> userOptional = this.userRepository.findById(id);
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("id: " + id);
         }
 
         User userTobeUpdated = userOptional.get();
 
-        return userRepository.save(userTobeUpdated);
+        userTobeUpdated.setFirstName(user.getFirstName());
+        userTobeUpdated.setLastName(user.getLastName());
+        userTobeUpdated.setEmail(user.getEmail());
+
+        this.userRepository.save(userTobeUpdated);
+        return  userTobeUpdated;
     }
 
 
@@ -92,6 +103,8 @@ public class ServiceImple {
         todo.setUser(user);
 
         todo.setStatus(Status.NEW);
+        todo.setModifiedAt(new Date());
+        todo.setCreatedAt(new Date());
         todoRepository.save(todo);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("id").buildAndExpand(todo.getId()).toUri();
 
@@ -114,13 +127,33 @@ public class ServiceImple {
         User user = userOptional.get();
         Todo todoTobeUpdated = todoOptional.get();
 
+        todoTobeUpdated.setModifiedAt(new Date());
+        todoTobeUpdated.setTodo(todo.getTodo());
+        todoTobeUpdated.setDescription(todo.getDescription());
+
         //create a condition that wont let the user not to update the todo status to NEW
         //the status need to be in progress or done.
-
-
-        todoTobeUpdated.setModifiedAt(new Date());
+        if(todo.getStatus().equals(Status.NEW)){
+            throw new RuntimeException("todo id: "+todoId +"Cannot be NEW");
+        }
+        todoTobeUpdated.setStatus(todo.getStatus());
         return todoRepository.save(todoTobeUpdated);
     }
 
     //delete user to do my id
+    public void deleteUserTodo(long userId, long todoId){
+        Optional<User> userOptional = this.userRepository.findById(userId);
+        Optional<Todo> todoOptional = this.todoRepository.findById(todoId);
+
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("id: " + userId);
+        }
+        if (!todoOptional.isPresent()) {
+            throw new TodoNotFoundException("id: " + todoId);
+        }
+
+        Todo todoToBeDeleted = todoOptional.get();
+        todoRepository.delete(todoToBeDeleted);
+
+    }
 }
