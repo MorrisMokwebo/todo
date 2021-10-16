@@ -24,10 +24,13 @@ public class ServiceImple {
     private final UserRepository userRepository;
     private final TodoRepository todoRepository;
 
+    private  final  EmailSenderService emailSenderService;
+
     @Autowired
-    public ServiceImple(UserRepository userRepository, TodoRepository todoRepository) {
+    public ServiceImple(UserRepository userRepository, TodoRepository todoRepository, EmailSenderService emailSenderService) {
         this.userRepository = userRepository;
         this.todoRepository = todoRepository;
+        this.emailSenderService = emailSenderService;
     }
 
     //Get all users
@@ -105,6 +108,9 @@ public class ServiceImple {
         todo.setStatus(Status.NEW);
         todo.setModifiedAt(new Date());
         todo.setCreatedAt(new Date());
+
+        emailSenderService.sendEmail(user.getEmail(),todo.getTodo(),"Hello there, this is a notification to let you know that your todo was successfully created.");
+
         todoRepository.save(todo);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("id").buildAndExpand(todo.getId()).toUri();
 
